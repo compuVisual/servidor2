@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -69,11 +68,6 @@ func main() {
 		c.Next()
 	})
 
-	// 🔥 NUEVO ENDPOINT /ping
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "pong"})
-	})
-
 	// RUTAS
 	r.POST("/profesores", insertarProfesor)
 	r.GET("/profesores", listarProfesores)
@@ -90,12 +84,7 @@ func main() {
 	r.GET("/matriculas", listarMatriculas)
 	r.PUT("/matricula/:id", actualizarNotas)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
-	r.Run("0.0.0.0:" + port)
-
+	r.Run(":8000")
 }
 
 // FUNCIONES
@@ -215,4 +204,6 @@ func actualizarNotas(c *gin.Context) {
 	db.Save(&m)
 
 	c.JSON(http.StatusOK, gin.H{"status": "Notas actualizadas"})
+	//si se actualizo todo
+
 }
