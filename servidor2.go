@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -44,7 +46,15 @@ type Matricula struct {
 var db *gorm.DB
 
 func main() {
-	dsn := "root:Scarleth3023@tcp(127.0.0.1:3306)/servidor2?charset=utf8mb4&parseTime=True&loc=Local"
+	//dsn := "root:Scarleth3023@tcp(127.0.0.1:3306)/servidor2?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.Getenv("MYSQLUSER"),
+		os.Getenv("MYSQLPASSWORD"),
+		os.Getenv("MYSQLHOST"),
+		os.Getenv("MYSQLPORT"),
+		os.Getenv("MYSQLDATABASE"),
+	)
+
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
