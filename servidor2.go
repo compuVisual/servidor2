@@ -2,14 +2,14 @@ package main
 
 import (
 	"net/http"
+	
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 // MODELOS
-
 type Estudiante struct {
 	ID     uint   `gorm:"primaryKey"`
 	Nombre string `gorm:"unique"`
@@ -25,13 +25,13 @@ func (Profesor) TableName() string {
 }
 
 type Asignatura struct {
-	ID         uint `gorm:"primaryKey"`
+	ID         uint   `gorm:"primaryKey"`
 	Nombre     string
 	ProfesorID uint
 }
 
 type Matricula struct {
-	ID           uint `gorm:"primaryKey"`
+	ID           uint    `gorm:"primaryKey"`
 	EstudianteID uint
 	AsignaturaID uint
 	Ciclo        string
@@ -44,9 +44,10 @@ type Matricula struct {
 var db *gorm.DB
 
 func main() {
-	dsn := "root:Scarleth3023@tcp(127.0.0.1:3306)/servidor2?charset=utf8mb4&parseTime=True&loc=Local"
+	// Conexión PostgreSQL (ajusta con los datos de Render)
+	dsn := "host=dpg-d0dcqqmuk2gs73cvrhbg-a user=servidor2_user password=RiYpicJseF8Ktf5U3IgupT7iJaWAEJAl dbname=servidor2 port=5432 sslmode=require TimeZone=America/Guayaquil"
 	var err error
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Error al conectar con base de datos: " + err.Error())
 	}
@@ -56,7 +57,7 @@ func main() {
 
 	r := gin.Default()
 
-	// ✅ Middleware CORS
+	// Middleware CORS
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
@@ -68,7 +69,7 @@ func main() {
 		c.Next()
 	})
 
-	// RUTAS
+	// Rutas
 	r.POST("/profesores", insertarProfesor)
 	r.GET("/profesores", listarProfesores)
 	r.DELETE("/profesores/:id", eliminarProfesor)
@@ -84,19 +85,10 @@ func main() {
 	r.GET("/matriculas", listarMatriculas)
 	r.PUT("/matricula/:id", actualizarNotas)
 
-	r.GET("/ping", func(c *gin.Context) {
-		sqlDB, err := db.DB()
-		if err != nil || sqlDB.Ping() != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": "Servidor no disponible"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"status": "Servidor activo"})
-	})
 	r.Run(":8000")
 }
 
 // FUNCIONES
-
 func listarProfesores(c *gin.Context) {
 	var profesores []Profesor
 	db.Find(&profesores)
@@ -212,6 +204,4 @@ func actualizarNotas(c *gin.Context) {
 	db.Save(&m)
 
 	c.JSON(http.StatusOK, gin.H{"status": "Notas actualizadas"})
-	//si se actualizo todo
-
 }
