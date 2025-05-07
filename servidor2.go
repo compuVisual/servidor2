@@ -85,6 +85,14 @@ func main() {
 	r.GET("/matriculas", listarMatriculas)
 	r.PUT("/matricula/:id", actualizarNotas)
 
+	r.GET("/ping", func(c *gin.Context) {
+		sqlDB, err := db.DB()
+		if err != nil || sqlDB.Ping() != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "Servidor no disponible"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "Servidor activo"})
+	})
 	//r.Run(":8000")
 	// Puerto desde entorno
 	port := os.Getenv("PORT")
