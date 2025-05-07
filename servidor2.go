@@ -85,7 +85,13 @@ func main() {
 	r.GET("/matriculas", listarMatriculas)
 	r.PUT("/matricula/:id", actualizarNotas)
 
-	r.Run(":8000")
+	//r.Run(":8000")
+	// Puerto desde entorno
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "10000"
+	}
+	r.Run(":" + port)
 }
 
 // FUNCIONES
